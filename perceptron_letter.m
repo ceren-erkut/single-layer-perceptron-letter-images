@@ -1,4 +1,4 @@
-function ceren_erkut_21602906_hw1(question)
+function perceptron_letter
 clc
 close all
 
