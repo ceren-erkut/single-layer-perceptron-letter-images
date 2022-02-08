@@ -2,73 +2,6 @@ function ceren_erkut_21602906_hw1(question)
 clc
 close all
 
-switch question
-    case '1'
-	disp('1')
-        disp('=== Please look at the report for solution. ===')
-        
-    case '2'
-	disp('2')
-        %% Q2 PART A
-        disp('=== Question 2 Part A solution is on the report. ===')
-        
-        %% Q2 PART B
-        disp('=== Question 2 Part B solution is initiated. ===')
-        N = 2^4-1; % there are 4 input neurons
-        W_hidden_extended = [1 0 1 1 2.7; 0 -1 1 1 1.6; -1 1 -1 0 0.4; -1 1 0 -1 0.4] % extended weight matrix for hidden layer
-        W_output_extended = [1 1 1 1 0.3] % weight vector of output layer
-        input_extended = zeros(5, N+1);
-        logic_result = zeros(1, N+1);
-        
-        for n = 0:N
-            % input number conversion into input vector
-            input_bin = dec2bin(n, 4);
-            input = transpose(str2num(input_bin(:)));
-            logic_result(n+1) = xor((input(1) | ~input(2)), (~input(3) | ~input(4))); % expected result of the logical expression with that input
-            input = [input -1]; % bias term is added
-            input_extended(:, n+1) = transpose(input); % 5 by 16 extended input vector
-        end
-        
-        accuracy_nonrobust = NN_question2(input_extended, W_hidden_extended, W_output_extended, N+1, logic_result);
-        fprintf('Non Robust Accuracy is %.2f%% \n', accuracy_nonrobust);
-        
-        %% Q2 PART C
-        disp('=== Question 2 Part C solution is initiated. ===')
-        % for robustness
-        W_hidden_extended_robust = [1 0 1 1 2.5; 0 -1 1 1 1.5; -1 1 -1 0 0.5; -1 1 0 -1 0.5] % extended weight matrix for hidden layer
-        W_output_extended_robust = [1 1 1 1 0.5] % weight vector of output layer
-        
-        accuracy_robust = NN_question2(input_extended, W_hidden_extended_robust, W_output_extended_robust, N+1, logic_result);
-        fprintf('Robust Accuracy is %.2f%% \n', accuracy_robust);
-                
-        %% Q2 PART D
-        disp('=== Question 2 Part D solution is initiated. ===')
-        num_samples = 25;
-        total_iteration = num_samples*(N+1);
-        randomized_input = zeros(total_iteration, 4);
-        
-        for n = 0:N
-            % input number conversion into input vector
-            input_bin = dec2bin(n, 4);
-            input_vec = transpose(str2num(input_bin(:)));
-            for index = 1:num_samples
-                randomized_input(num_samples*n + index, :) = input_vec + normrnd(0, 0.2, [1,4]);
-            end
-        end
-        
-        randomized_input_extended = [randomized_input -1*ones(total_iteration,1)];
-        randomized_input_extended = transpose(randomized_input_extended); % 5 by 400 matrix
-        
-        logic_result_repeated = repelem(logic_result, num_samples);
-        
-        accuracy_rnd_nonrobust = NN_question2(randomized_input_extended, W_hidden_extended, W_output_extended, total_iteration, logic_result_repeated);
-        accuracy_rnd_robust = NN_question2(randomized_input_extended, W_hidden_extended_robust, W_output_extended_robust, total_iteration, logic_result_repeated);
-        
-        fprintf('Noisy Non Robust Accuracy is %.2f%% \n', accuracy_rnd_nonrobust);
-        fprintf('Noisy Robust Accuracy is %.2f%% \n', accuracy_rnd_robust);
-        
-    case '3'
-	disp('3')
         %% Q3 PART A
         disp('=== Question 3 Part A solution is initiated. ===')
 
@@ -221,30 +154,9 @@ switch question
         xlabel("Test Index")
         ylabel("MSE")
         
-    case '4'
-    disp('4')
-        disp('=== Please look at the report for solution. ===')
-        
-end
 
 end
 
-function accuracy = NN_question2(input_extended, W_hidden_extended, W_output_extended, N, logic_result)
-
-V = W_hidden_extended * input_extended; % activation potential function of hidden layer
-
-O = heaviside(V); % unipolar step function is applied to hidden layer
-O_extended = [O; -1*ones(1,N)]; % extended input vector to the output layer
-
-V_out = W_output_extended * O_extended; % activation potential function of output layer
-
-output = heaviside(V_out); % unipolar step function is applied to output layer
-
-correct = length(find(output == double(logic_result)));
-
-accuracy = (correct / N) * 100;
-
-end
 
 function [MSE_test, weight_matrix_extended] = perceptron(mean, std, output_neuron_num, input_neuron_size, class_num, iteration, learning_rate, train_images, train_num, train_labels)  
 
